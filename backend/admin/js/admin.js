@@ -6,6 +6,8 @@ class QuizAdmin {
         this.currentPage = 'dashboard';
         this.currentUser = null;
         this.charts = {}; // Store chart instances for proper cleanup
+        this.selectedMediaFiles = [];
+        this.existingMediaAttachments = [];
         
         this.init();
     }
@@ -17,41 +19,65 @@ class QuizAdmin {
 
     setupEventListeners() {
         // Login form
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleLogin();
-        });
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleLogin();
+            });
+        }
 
         // Logout button
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            this.handleLogout();
-        });
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                this.handleLogout();
+            });
+        }
 
         // Sidebar toggle
-        document.getElementById('sidebar-toggle').addEventListener('click', () => {
-            this.toggleSidebar();
-        });
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                this.toggleSidebar();
+            });
+        }
 
         // Menu navigation
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.dataset.page;
-                this.navigateToPage(page);
+        const menuItems = document.querySelectorAll('.menu-item');
+        if (menuItems && menuItems.length) {
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const page = item.dataset.page;
+                    this.navigateToPage(page);
+                });
             });
-        });
+        }
 
         // Modal close buttons
-        document.querySelectorAll('.modal-close').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.closeModal();
+        const modalCloseButtons = document.querySelectorAll('.modal-close');
+        if (modalCloseButtons && modalCloseButtons.length) {
+            modalCloseButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    this.closeModal();
+                });
             });
-        });
+        }
 
         // Question form
-        document.getElementById('question-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleQuestionSubmit();
-        });
+        const questionForm = document.getElementById('question-form');
+        if (questionForm) {
+            questionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleQuestionSubmit();
+            });
+        }
+
+        // Media files input change
+        const mediaInput = document.getElementById('media-files');
+        if (mediaInput) {
+            mediaInput.addEventListener('change', (e) => this.handleMediaFilesChange(e));
+        }
 
         // Category form
         document.getElementById('category-form').addEventListener('submit', (e) => {
@@ -116,44 +142,133 @@ class QuizAdmin {
         });
 
         // Cities management
-        document.getElementById('add-city-btn').addEventListener('click', () => {
-            this.openCityModal();
-        });
+        const addCityBtn = document.getElementById('add-city-btn');
+        if (addCityBtn) {
+            addCityBtn.addEventListener('click', () => {
+                this.openCityModal();
+            });
+        }
 
         // Institutions management
-        document.getElementById('add-institution-btn').addEventListener('click', () => {
-            this.openInstitutionModal();
-        });
+        const addInstitutionBtn = document.getElementById('add-institution-btn');
+        if (addInstitutionBtn) {
+            addInstitutionBtn.addEventListener('click', () => {
+                this.openInstitutionModal();
+            });
+        }
 
         // Positions management
-        document.getElementById('add-position-btn').addEventListener('click', () => {
-            this.openPositionModal();
-        });
+        const addPositionBtn = document.getElementById('add-position-btn');
+        if (addPositionBtn) {
+            addPositionBtn.addEventListener('click', () => {
+                this.openPositionModal();
+            });
+        }
 
         // Player Stats management
-        document.getElementById('refresh-stats-btn').addEventListener('click', () => {
-            this.loadPlayerStats();
-        });
+        const refreshStatsBtn = document.getElementById('refresh-stats-btn');
+        if (refreshStatsBtn) {
+            refreshStatsBtn.addEventListener('click', () => {
+                this.loadPlayerStats();
+            });
+        }
 
-        document.getElementById('stats-period').addEventListener('change', () => {
-            this.loadPlayerStats();
-        });
+        const statsPeriod = document.getElementById('stats-period');
+        if (statsPeriod) {
+            statsPeriod.addEventListener('change', () => {
+                this.loadPlayerStats();
+            });
+        }
 
-        document.getElementById('stats-category').addEventListener('change', () => {
-            this.loadPlayerStats();
-        });
+        const statsCategory = document.getElementById('stats-category');
+        if (statsCategory) {
+            statsCategory.addEventListener('change', () => {
+                this.loadPlayerStats();
+            });
+        }
 
-        document.getElementById('player-search').addEventListener('input', (e) => {
-            this.searchPlayers(e.target.value);
-        });
+        const playerSearch = document.getElementById('player-search');
+        if (playerSearch) {
+            playerSearch.addEventListener('input', (e) => {
+                this.searchPlayers(e.target.value);
+            });
+        }
 
-        document.getElementById('prev-stats-page').addEventListener('click', () => {
-            this.previousStatsPage();
-        });
+        const prevStatsPage = document.getElementById('prev-stats-page');
+        if (prevStatsPage) {
+            prevStatsPage.addEventListener('click', () => {
+                this.previousStatsPage();
+            });
+        }
 
-        document.getElementById('next-stats-page').addEventListener('click', () => {
-            this.nextStatsPage();
-        });
+        const nextStatsPage = document.getElementById('next-stats-page');
+        if (nextStatsPage) {
+            nextStatsPage.addEventListener('click', () => {
+                this.nextStatsPage();
+            });
+        }
+
+        // Media files handling (guarded above already)
+        const mediaFilesInput = document.getElementById('media-files');
+        if (mediaFilesInput) {
+            mediaFilesInput.addEventListener('change', (e) => {
+                this.handleMediaFilesChange(e);
+            });
+        }
+    }
+
+    showLoginModal() {
+        const loginModal = document.getElementById('login-modal');
+        const adminPanel = document.getElementById('admin-panel');
+        const loading = document.getElementById('loading-screen');
+        if (loginModal) loginModal.classList.add('show');
+        if (adminPanel) adminPanel.style.display = 'none';
+        if (loading) loading.style.display = 'none';
+    }
+
+    showAdminPanel() {
+        console.log('Showing admin panel...');
+        const loginModal = document.getElementById('login-modal');
+        const adminPanel = document.getElementById('admin-panel');
+        const userNameEl = document.getElementById('user-name');
+        const loading = document.getElementById('loading-screen');
+        if (loginModal) loginModal.classList.remove('show');
+        if (adminPanel) adminPanel.style.display = 'flex';
+        if (userNameEl && this.currentUser) {
+            userNameEl.textContent = `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+        }
+        if (loading) loading.style.display = 'none';
+        
+        // Initialize dashboard as the default active page when SPA structure exists
+        const pageContainer = document.querySelector('.page');
+        if (pageContainer) {
+            console.log('Initializing dashboard as default page...');
+            this.navigateToPage('dashboard');
+        } else {
+            // Multi-page: auto initialize based on available elements
+            this.autoInitPage();
+        }
+        console.log('Admin panel shown successfully');
+    }
+
+    autoInitPage() {
+        // Detect and load page-specific data for multi-page setup
+        if (document.querySelector('#questions-table')) {
+            this.currentPage = 'questions';
+            this.loadQuestions();
+            return;
+        }
+        if (document.querySelector('.categories-grid')) {
+            this.currentPage = 'categories';
+            this.loadCategories();
+            return;
+        }
+        if (document.getElementById('dashboard-stats')) {
+            this.currentPage = 'dashboard';
+            this.loadDashboard();
+            return;
+        }
+        // Add more detections as needed
     }
 
     async checkAuth() {
@@ -173,13 +288,13 @@ class QuizAdmin {
     }
 
     async handleLogin() {
-        const email = document.getElementById('email').value;
+        const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('login-error');
 
         try {
             const response = await this.apiCall('/auth/login', 'POST', {
-                email,
+                username,
                 password
             });
 
@@ -647,13 +762,39 @@ class QuizAdmin {
         document.getElementById('quiz-questions-count').value = '5';
     }
 
-    openQuestionModal(questionId = null) {
+    async openQuestionModal(questionId = null) {
         const modal = document.getElementById('question-modal');
         const title = document.getElementById('question-modal-title');
+
+        // Reset media state and preview
+        this.selectedMediaFiles = [];
+        this.existingMediaAttachments = [];
+        const mediaInput = document.getElementById('media-files');
+        if (mediaInput) mediaInput.value = '';
+        const preview = document.getElementById('media-preview');
+        if (preview) preview.innerHTML = '';
+
+        // Load categories into the question form select before showing
+        try {
+            const response = await this.apiCall('/admin/categories', 'GET');
+            const categorySelect = document.getElementById('question-category');
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">Оберіть категорію</option>';
+                (response.categories || []).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading categories for question form:', error);
+            this.showToast('Не вдалося завантажити категорії', 'error');
+        }
         
         if (questionId) {
             title.textContent = 'Редагувати питання';
-            this.loadQuestionData(questionId);
+            await this.loadQuestionData(questionId);
         } else {
             title.textContent = 'Додати питання';
             this.clearQuestionForm();
@@ -748,6 +889,19 @@ class QuizAdmin {
             explanation: document.getElementById('explanation').value,
             difficultyLevel: parseInt(document.getElementById('difficulty-level').value)
         };
+
+        // Upload selected media files and include attachments
+        let uploadedAttachments = [];
+        try {
+            uploadedAttachments = await this.uploadSelectedMediaFiles();
+        } catch (e) {
+            // Upload error already notified; abort save
+            return;
+        }
+        formData.mediaAttachments = [
+            ...((this.existingMediaAttachments || [])),
+            ...uploadedAttachments
+        ];
 
         const questionId = document.getElementById('question-id').value;
 
@@ -1074,10 +1228,100 @@ class QuizAdmin {
         return await response.json();
     }
 
+    // Media upload handlers
+    handleMediaFilesChange(e) {
+        const files = Array.from(e.target.files || []);
+        const allowed = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+        if (allowed.length > 5) {
+            this.showToast('Максимум 5 файлів', 'error');
+        }
+        this.selectedMediaFiles = allowed.slice(0, 5);
+        this.renderMediaPreview();
+    }
+
+    renderMediaPreview() {
+        const container = document.getElementById('media-preview');
+        if (!container) return;
+        container.innerHTML = '';
+
+        this.selectedMediaFiles.forEach((file, index) => {
+            const item = document.createElement('div');
+            item.className = `media-item ${file.type.startsWith('video/') ? 'video' : ''}`;
+
+            const url = URL.createObjectURL(file);
+            let mediaEl;
+            if (file.type.startsWith('video/')) {
+                mediaEl = document.createElement('video');
+                mediaEl.src = url;
+                mediaEl.muted = true;
+                mediaEl.controls = false;
+            } else {
+                mediaEl = document.createElement('img');
+                mediaEl.src = url;
+            }
+            item.appendChild(mediaEl);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-media';
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', () => this.removeSelectedMediaFile(index));
+            item.appendChild(removeBtn);
+
+            const name = document.createElement('div');
+            name.className = 'file-name';
+            name.textContent = file.name;
+            item.appendChild(name);
+
+            container.appendChild(item);
+
+            mediaEl.addEventListener('loadeddata', () => URL.revokeObjectURL(url));
+        });
+    }
+
+    removeSelectedMediaFile(index) {
+        this.selectedMediaFiles.splice(index, 1);
+        const mediaInput = document.getElementById('media-files');
+        if (mediaInput) mediaInput.value = '';
+        this.renderMediaPreview();
+    }
+
+    async uploadSelectedMediaFiles() {
+        if (!this.selectedMediaFiles || this.selectedMediaFiles.length === 0) {
+            return [];
+        }
+        const formData = new FormData();
+        this.selectedMediaFiles.forEach(file => formData.append('mediaFiles', file));
+
+        const response = await fetch(`${this.apiBaseUrl}/media/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.authToken}`
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            const msg = result && result.message ? result.message : 'Помилка завантаження файлів';
+            this.showToast(msg, 'error');
+            throw new Error(msg);
+        }
+        const attachments = (result.data && result.data.mediaAttachments) ? result.data.mediaAttachments : [];
+        this.showToast(`Завантажено файлів: ${attachments.length}`, 'success');
+        return attachments;
+    }
+
     // Helper methods for form handling
     clearQuestionForm() {
         document.getElementById('question-form').reset();
         document.getElementById('question-id').value = '';
+        // Reset media inputs and preview
+        this.selectedMediaFiles = [];
+        this.existingMediaAttachments = [];
+        const mediaInput = document.getElementById('media-files');
+        if (mediaInput) mediaInput.value = '';
+        const preview = document.getElementById('media-preview');
+        if (preview) preview.innerHTML = '';
     }
 
     clearCategoryForm() {

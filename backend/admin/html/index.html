@@ -8,7 +8,7 @@
     
     <!-- Removed blocked Chart.js CSS -->
     
-    <link href="css/admin.css" rel="stylesheet">
+    <link href="/admin/css/admin.css" rel="stylesheet">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -24,8 +24,8 @@
                 <h2><i class="fas fa-shield-alt"></i> Вхід в адмін панель</h2>
                 <form id="login-form">
                     <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" required>
+                        <label for="username">Ім'я користувача:</label>
+                        <input type="text" id="username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Пароль:</label>
@@ -592,6 +592,16 @@
                         <textarea id="explanation" rows="3"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="media-files">Медіафайли (фото/відео):</label>
+                        <input type="file" id="media-files" multiple accept="image/*,video/*">
+                        <div class="file-info">
+                            <small>Максимум 5 файлів. Підтримуються: JPG, PNG, GIF, MP4, AVI, MOV (до 10MB кожен)</small>
+                        </div>
+                        <div id="media-preview" class="media-preview">
+                            <!-- Preview of uploaded files will appear here -->
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="difficulty-level">Рівень складності:</label>
                         <select id="difficulty-level">
                             <option value="1">1 - Легкий</option>
@@ -750,7 +760,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/vendor/chart.min.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="/admin/js/vendor/chart.min.js"></script>
+    <script src="/admin/js/admin.js"></script>
 </body>
 </html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Адмін • Питання</title>
+    <link rel="stylesheet" href="/admin/css/admin.css" />
+    <link rel="icon" href="/admin/favicon.ico" />
+</head>
+<body>
+    <div id="admin-panel" class="admin-panel">
+        <header class="admin-header">
+            <h1>Адмін панель</h1>
+            <button id="logout-btn" class="btn btn-secondary">Вийти</button>
+        </header>
+        <div class="admin-body">
+            <aside class="admin-sidebar">
+                <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+                <nav class="sidebar-menu">
+                    <a href="/admin/dashboard" class="menu-item" data-page="dashboard">Дашборд</a>
+                    <a href="/admin/questions" class="menu-item active" data-page="questions">Питання</a>
+                    <a href="/admin/categories" class="menu-item" data-page="categories">Категорії</a>
+                </nav>
+            </aside>
+            <main class="admin-content">
+                <section id="questions-page" class="page active">
+                    <div class="page-header">
+                        <h2>Питання</h2>
+                        <div class="actions">
+                            <input id="questions-search" type="text" placeholder="Пошук питань" />
+                            <button id="add-question-btn" class="btn btn-primary">Додати питання</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="questions-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Текст</th>
+                                    <th>Категорія</th>
+                                    <th>Складність</th>
+                                    <th>Статус</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Login modal (kept for auth flow; hidden by default) -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h3>Вхід в адмін панель</h3>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required />
+                <input type="password" id="login-password" placeholder="Пароль" required />
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Увійти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Question modal -->
+    <div id="question-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="question-modal-title">Додати питання</h3>
+            <form id="question-form">
+                <input type="hidden" id="question-id" />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="question-category">Категорія</label>
+                        <select id="question-category" required>
+                            <option value="">Оберіть категорію</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="question-text">Текст питання</label>
+                        <textarea id="question-text" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="option-a">Варіант A</label>
+                        <input id="option-a" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="option-b">Варіант B</label>
+                        <input id="option-b" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="option-c">Варіант C</label>
+                        <input id="option-c" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="option-d">Варіант D</label>
+                        <input id="option-d" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="correct-answer">Правильна відповідь</label>
+                        <select id="correct-answer" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="explanation">Пояснення (необов'язково)</label>
+                        <textarea id="explanation" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty-level">Складність</label>
+                        <select id="difficulty-level" required>
+                            <option value="1">1 - Легка</option>
+                            <option value="2">2 - Середня</option>
+                            <option value="3">3 - Важка</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="media-files">Медіа файли</label>
+                        <input id="media-files" type="file" accept="image/*,video/*,audio/*" multiple />
+                        <div id="media-preview" class="media-preview"></div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                    <button type="submit" class="btn btn-primary">Зберегти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+    <script>
+        // Auto-init specific page
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.admin && typeof window.admin.showAdminPanel === 'function') {
+                window.admin.showAdminPanel();
+            } else if (window.admin && typeof window.admin.init === 'function') {
+                window.admin.init();
+            }
+        });
+    </script>
+</body>
+</html>

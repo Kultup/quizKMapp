@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../models/user.dart';
 import '../models/position.dart';
 import '../models/category.dart';
 import '../models/quiz.dart';
@@ -13,14 +12,14 @@ class ApiService {
   static final String baseUrl = kIsWeb
       ? 'http://localhost:3000/api'
       : 'http://10.0.2.2:3000/api';
-  
+
   // Singleton pattern
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
   ApiService._internal();
-  
+
   String? _token;
-  
+
   void setToken(String token) {
     _token = token;
   }
@@ -28,16 +27,14 @@ class ApiService {
   void clearToken() {
     _token = null;
   }
-  
+
   Map<String, String> get _headers {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-    
+    final headers = {'Content-Type': 'application/json'};
+
     if (_token != null) {
       headers['Authorization'] = 'Bearer $_token';
     }
-    
+
     return headers;
   }
 
@@ -81,10 +78,7 @@ class ApiService {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
       headers: _headers,
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
+      body: jsonEncode({'username': username, 'password': password}),
     );
 
     if (response.statusCode == 200) {
@@ -96,8 +90,6 @@ class ApiService {
     }
   }
 
-
-
   // Dropdown data for registration
   Future<List<Map<String, dynamic>>> getCities() async {
     final response = await http.get(
@@ -106,15 +98,25 @@ class ApiService {
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final rawList = (data is Map && data.containsKey('data')) ? data['data'] : data;
+      final rawList = (data is Map && data.containsKey('data'))
+          ? data['data']
+          : data;
 
       final List<Map<String, dynamic>> list = [];
       if (rawList is List) {
         for (final item in rawList) {
           if (item is Map<String, dynamic>) {
             // Ensure we have a proper name field
-            if (!item.containsKey('name') || item['name'] == null || item['name'].toString().isEmpty) {
-              final name = item['title'] ?? item['label'] ?? item['shortName'] ?? item['value'] ?? item['city'] ?? 'Невідоме місто';
+            if (!item.containsKey('name') ||
+                item['name'] == null ||
+                item['name'].toString().isEmpty) {
+              final name =
+                  item['title'] ??
+                  item['label'] ??
+                  item['shortName'] ??
+                  item['value'] ??
+                  item['city'] ??
+                  'Невідоме місто';
               item['name'] = name.toString();
             }
             list.add(item);
@@ -140,15 +142,25 @@ class ApiService {
     final response = await http.get(uri, headers: _headers);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final rawList = (data is Map && data.containsKey('data')) ? data['data'] : data;
+      final rawList = (data is Map && data.containsKey('data'))
+          ? data['data']
+          : data;
 
       final List<Map<String, dynamic>> list = [];
       if (rawList is List) {
         for (final item in rawList) {
           if (item is Map<String, dynamic>) {
             // normalize name field
-            if (!item.containsKey('name') || item['name'] == null || item['name'].toString().isEmpty) {
-              final name = item['title'] ?? item['label'] ?? item['shortName'] ?? item['value'] ?? item['institution'] ?? 'Невідомий заклад';
+            if (!item.containsKey('name') ||
+                item['name'] == null ||
+                item['name'].toString().isEmpty) {
+              final name =
+                  item['title'] ??
+                  item['label'] ??
+                  item['shortName'] ??
+                  item['value'] ??
+                  item['institution'] ??
+                  'Невідомий заклад';
               item['name'] = name.toString();
             }
             list.add(item);
@@ -177,15 +189,19 @@ class ApiService {
         headers: _headers,
       );
 
-      print('📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}');
-      
+      print(
+        '📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}',
+      );
+
       if (response.statusCode == 200) {
-         print('📄 ApiService: Тіло відповіді: ${response.body}');
-         final Map<String, dynamic> responseData = jsonDecode(response.body);
-         final List<dynamic> data = responseData['categories'] ?? [];
-         final categories = data.map((json) => Category.fromJson(json)).toList();
-         print('✅ ApiService: Парсинг успішний. Категорій: ${categories.length}');
-         return categories;
+        print('📄 ApiService: Тіло відповіді: ${response.body}');
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final List<dynamic> data = responseData['categories'] ?? [];
+        final categories = data.map((json) => Category.fromJson(json)).toList();
+        print(
+          '✅ ApiService: Парсинг успішний. Категорій: ${categories.length}',
+        );
+        return categories;
       } else {
         print('❌ ApiService: Помилка статусу: ${response.statusCode}');
         throw Exception('Failed to load categories: ${response.statusCode}');
@@ -202,18 +218,17 @@ class ApiService {
     if (categoryName != null) {
       url += '?category=${Uri.encodeComponent(categoryName)}';
     }
-    
+
     try {
       print('🌐 ApiService: Відправляємо запит на $url');
       print('🔑 ApiService: Токен: ${_token != null ? 'є' : 'немає'}');
       print('📋 ApiService: Заголовки: $_headers');
-      final response = await http.get(
-        Uri.parse(url),
-        headers: _headers,
+      final response = await http.get(Uri.parse(url), headers: _headers);
+
+      print(
+        '📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}',
       );
 
-      print('📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}');
-      
       if (response.statusCode == 200) {
         print('📄 ApiService: Тіло відповіді: ${response.body}');
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -240,8 +255,10 @@ class ApiService {
         headers: _headers,
       );
 
-      print('📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}');
-      
+      print(
+        '📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}',
+      );
+
       if (response.statusCode == 200) {
         print('📄 ApiService: Тіло відповіді: ${response.body}');
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -261,15 +278,19 @@ class ApiService {
   // Questions
   Future<List<Question>> getQuizQuestions(String quizId) async {
     try {
-      print('🌐 ApiService: Відправляємо запит на $baseUrl/quizzes/$quizId/questions');
+      print(
+        '🌐 ApiService: Відправляємо запит на $baseUrl/quizzes/$quizId/questions',
+      );
       print('🔑 ApiService: Токен: ${_token != null ? 'є' : 'немає'}');
       final response = await http.get(
         Uri.parse('$baseUrl/quizzes/$quizId/questions'),
         headers: _headers,
       );
 
-      print('📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}');
-      
+      print(
+        '📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}',
+      );
+
       if (response.statusCode == 200) {
         print('📄 ApiService: Тіло відповіді: ${response.body}');
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -307,25 +328,27 @@ class ApiService {
         'time_taken': timeTaken,
         'is_daily_quiz': isDailyQuiz,
       };
-      
+
       print('🌐 ApiService: Відправляємо запит на $baseUrl/quiz/submit');
       print('🔑 ApiService: Токен: ${_token != null ? 'є' : 'немає'}');
       print('📋 ApiService: Заголовки: $_headers');
       print('📄 ApiService: Тіло запиту: ${jsonEncode(requestBody)}');
-      
+
       final response = await http.post(
         Uri.parse('$baseUrl/quiz/submit'),
         headers: _headers,
         body: jsonEncode(requestBody),
       );
 
-      print('📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}');
+      print(
+        '📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}',
+      );
       print('📄 ApiService: Тіло відповіді: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final resultData = responseData['result'];
-        
+
         // Create QuizResult from the new API response format
         final quizResult = QuizResult(
           id: resultData['id']?.toString() ?? '',
@@ -344,12 +367,14 @@ class ApiService {
               ?.map((answer) => DetailedAnswer.fromJson(answer))
               .toList(),
         );
-        
+
         print('✅ ApiService: Успішно створено QuizResult');
         return quizResult;
       } else {
         final errorData = jsonDecode(response.body);
-        throw Exception('Server error: ${errorData['error'] ?? 'Unknown error'}');
+        throw Exception(
+          'Server error: ${errorData['error'] ?? 'Unknown error'}',
+        );
       }
     } catch (e) {
       print('💥 ApiService: Мережева помилка при збереженні результату: $e');
@@ -382,7 +407,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final List<dynamic> positionsData = responseData['positions'];
-        
+
         // Convert _id to id for all positions
         final List<Position> positions = positionsData.map((json) {
           // Convert _id to id
@@ -393,7 +418,7 @@ class ApiService {
           }
           return Position.fromJson(jsonWithId);
         }).toList();
-        
+
         return positions;
       } else {
         throw Exception('Failed to load positions');
@@ -413,14 +438,14 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final positionData = jsonDecode(response.body);
-        
+
         // Convert _id to id
         final jsonWithId = Map<String, dynamic>.from(positionData);
         if (jsonWithId.containsKey('_id')) {
           jsonWithId['id'] = jsonWithId['_id'].toString();
           jsonWithId.remove('_id');
         }
-        
+
         return Position.fromJson(jsonWithId);
       } else {
         throw Exception('Failed to load position');
@@ -451,10 +476,15 @@ class ApiService {
     }
   }
 
-  Future<List<Question>> getRandomQuestionsForPosition(String positionId, {int count = 5}) async {
+  Future<List<Question>> getRandomQuestionsForPosition(
+    String positionId, {
+    int count = 5,
+  }) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/positions/$positionId/questions/random?count=$count'),
+        Uri.parse(
+          '$baseUrl/positions/$positionId/questions/random?count=$count',
+        ),
         headers: _headers,
       );
 
@@ -480,14 +510,16 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        
+
         // Convert _id to id for position
-        final positionData = Map<String, dynamic>.from(responseData['position']);
+        final positionData = Map<String, dynamic>.from(
+          responseData['position'],
+        );
         if (positionData.containsKey('_id')) {
           positionData['id'] = positionData['_id'].toString();
           positionData.remove('_id');
         }
-        
+
         return {
           'position': Position.fromJson(positionData),
           'availableQuestions': responseData['availableQuestions'],
@@ -513,23 +545,27 @@ class ApiService {
         'currentPassword': currentPassword,
         'newPassword': newPassword,
       };
-      
+
       print('🌐 ApiService: Відправляємо запит на зміну пароля');
-      
+
       final response = await http.post(
         Uri.parse('$baseUrl/auth/change-password'),
         headers: _headers,
         body: jsonEncode(requestBody),
       );
 
-      print('📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}');
+      print(
+        '📡 ApiService: Отримано відповідь зі статусом ${response.statusCode}',
+      );
 
       if (response.statusCode == 200) {
         print('✅ ApiService: Пароль успішно змінено');
         return true;
       } else {
         final errorData = jsonDecode(response.body);
-        throw Exception('Server error: ${errorData['error'] ?? 'Unknown error'}');
+        throw Exception(
+          'Server error: ${errorData['error'] ?? 'Unknown error'}',
+        );
       }
     } catch (e) {
       print('💥 ApiService: Помилка зміни пароля: $e');
@@ -544,7 +580,9 @@ class ApiService {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/admin/users/stats?period=$period&category=$category'),
+        Uri.parse(
+          '$baseUrl/admin/users/stats?period=$period&category=$category',
+        ),
         headers: _headers,
       );
 
@@ -552,7 +590,9 @@ class ApiService {
         final List<dynamic> data = jsonDecode(response.body);
         return data.cast<Map<String, dynamic>>();
       } else {
-        throw Exception('Failed to load admin users stats: ${response.statusCode}');
+        throw Exception(
+          'Failed to load admin users stats: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('💥 ApiService: Помилка завантаження статистики адміна: $e');
@@ -570,7 +610,9 @@ class ApiService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to load admin dashboard stats: ${response.statusCode}');
+        throw Exception(
+          'Failed to load admin dashboard stats: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('💥 ApiService: Помилка завантаження дашборду адміна: $e');
@@ -604,21 +646,29 @@ class ApiService {
     String? body,
   }) async {
     final uri = Uri.parse(url);
-    
+
     LoggingService.instance.apiRequest(method, url);
-    
+
     try {
       http.Response response;
-      
+
       switch (method.toUpperCase()) {
         case 'GET':
           response = await http.get(uri, headers: headers ?? _headers);
           break;
         case 'POST':
-          response = await http.post(uri, headers: headers ?? _headers, body: body);
+          response = await http.post(
+            uri,
+            headers: headers ?? _headers,
+            body: body,
+          );
           break;
         case 'PUT':
-          response = await http.put(uri, headers: headers ?? _headers, body: body);
+          response = await http.put(
+            uri,
+            headers: headers ?? _headers,
+            body: body,
+          );
           break;
         case 'DELETE':
           response = await http.delete(uri, headers: headers ?? _headers);
@@ -626,18 +676,25 @@ class ApiService {
         default:
           throw Exception('Непідтримуваний HTTP метод: $method');
       }
-      
-      LoggingService.instance.apiRequest(method, url, statusCode: response.statusCode);
-      
+
+      LoggingService.instance.apiRequest(
+        method,
+        url,
+        statusCode: response.statusCode,
+      );
+
       if (response.statusCode >= 400) {
-        final errorMessage = 'HTTP ${response.statusCode}: ${response.reasonPhrase}';
-        LoggingService.instance.apiRequest(method, url, 
-          statusCode: response.statusCode, 
-          error: errorMessage
+        final errorMessage =
+            'HTTP ${response.statusCode}: ${response.reasonPhrase}';
+        LoggingService.instance.apiRequest(
+          method,
+          url,
+          statusCode: response.statusCode,
+          error: errorMessage,
         );
         throw Exception(errorMessage);
       }
-      
+
       return response;
     } catch (e) {
       LoggingService.instance.apiRequest(method, url, error: e.toString());

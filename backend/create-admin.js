@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-// Import User model
+// Import models
 const User = require('./src/models/User');
+const Position = require('./src/models/Position');
 
 async function createAdminUser() {
   try {
@@ -18,15 +19,29 @@ async function createAdminUser() {
       process.exit(0);
     }
 
+    // First, create or find an admin position
+    let adminPosition = await Position.findOne({ name: 'Адміністратор системи' });
+    if (!adminPosition) {
+      adminPosition = await Position.create({
+        name: 'Адміністратор системи',
+        category: 'адміністратор_закладу',
+        description: 'Системний адміністратор додатку',
+        level: 'керівний',
+        isActive: true
+      });
+      console.log('Admin position created');
+    }
+
     // Admin user credentials
     const adminData = {
       firstName: 'Admin',
       lastName: 'User',
       city: 'System',
-      position: 'Administrator',
+      position: adminPosition._id,
+      username: 'admin',
       email: 'admin@quizapp.com',
       phone: '+1234567890',
-      password: 'admin123', // Change this to a secure password
+      password: 'admin123',
       isAdmin: true
     };
 
@@ -40,6 +55,7 @@ async function createAdminUser() {
       lastName: adminData.lastName,
       city: adminData.city,
       position: adminData.position,
+      username: adminData.username,
       email: adminData.email,
       phone: adminData.phone,
       passwordHash: passwordHash,

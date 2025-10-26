@@ -31,6 +31,19 @@ const createQuestion = async (req, res) => {
     }
 
     const questionData = req.body;
+    
+    // Handle media attachments if provided
+    if (questionData.mediaAttachments && Array.isArray(questionData.mediaAttachments)) {
+      // Validate media attachments format
+      for (const media of questionData.mediaAttachments) {
+        if (!media.type || !media.filename || !media.url || !media.mimeType) {
+          return res.status(400).json({ 
+            error: 'Invalid media attachment format' 
+          });
+        }
+      }
+    }
+
     const question = await Question.create(questionData);
 
     res.status(201).json({
@@ -74,6 +87,18 @@ const updateQuestion = async (req, res) => {
 
     const { id } = req.params;
     const updateData = req.body;
+
+    // Handle media attachments if provided
+    if (updateData.mediaAttachments && Array.isArray(updateData.mediaAttachments)) {
+      // Validate media attachments format
+      for (const media of updateData.mediaAttachments) {
+        if (!media.type || !media.filename || !media.url || !media.mimeType) {
+          return res.status(400).json({ 
+            error: 'Invalid media attachment format' 
+          });
+        }
+      }
+    }
 
     const question = await Question.update(parseInt(id), updateData);
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Адмін • Звіти</title>
+    <link rel="stylesheet" href="/admin/css/admin.css" />
+    <link rel="icon" href="/admin/favicon.ico" />
+</head>
+<body>
+    <div id="admin-panel" class="admin-panel">
+        <header class="admin-header">
+            <h1>Адмін панель</h1>
+            <button id="logout-btn" class="btn btn-secondary">Вийти</button>
+        </header>
+        <div class="admin-body">
+            <aside class="admin-sidebar">
+                <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+                <nav class="sidebar-menu">
+                    <a href="/admin/dashboard" class="menu-item" data-page="dashboard">Дашборд</a>
+                    <a href="/admin/questions" class="menu-item" data-page="questions">Питання</a>
+                    <a href="/admin/categories" class="menu-item" data-page="categories">Категорії</a>
+                    <a href="/admin/users" class="menu-item" data-page="users">Користувачі</a>
+                    <a href="/admin/player-stats" class="menu-item" data-page="player-stats">Статистика гравців</a>
+                    <a href="/admin/cities" class="menu-item" data-page="cities">Міста</a>
+                    <a href="/admin/institutions" class="menu-item" data-page="institutions">Заклади</a>
+                    <a href="/admin/positions" class="menu-item" data-page="positions">Посади</a>
+                    <a href="/admin/quizzes" class="menu-item" data-page="quizzes">Квізи</a>
+                    <a href="/admin/reports" class="menu-item active" data-page="reports">Звіти</a>
+                    <a href="/admin/settings" class="menu-item" data-page="settings">Налаштування</a>
+                </nav>
+            </aside>
+            <main class="admin-content">
+                <section id="reports-page" class="page active">
+                    <div class="page-header">
+                        <h2>Звіти та експорт</h2>
+                    </div>
+
+                    <div class="card">
+                        <h3>Експорт користувачів</h3>
+                        <p>Експортувати повний список користувачів у XLSX</p>
+                        <button id="export-users-btn" class="btn btn-primary">Експортувати користувачів</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Експорт звіту по квізах</h3>
+                        <div class="filters">
+                            <label>
+                                Початкова дата:
+                                <input id="start-date" type="date" />
+                            </label>
+                            <label>
+                                Кінцева дата:
+                                <input id="end-date" type="date" />
+                            </label>
+                        </div>
+                        <button id="export-quiz-btn" class="btn btn-primary">Експортувати звіт по квізах</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">×</span>
+            <h2>Вхід адміністратора</h2>
+            <form id="login-form">
+                <label>Email
+                    <input type="email" id="login-email" required />
+                </label>
+                <label>Пароль
+                    <input type="password" id="login-password" required />
+                </label>
+                <button type="submit" class="btn btn-primary">Увійти</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+</body>
+</html>

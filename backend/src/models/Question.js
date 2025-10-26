@@ -46,6 +46,38 @@ const questionSchema = new mongoose.Schema({
     trim: true,
     maxlength: 1000
   },
+  // Media attachments
+  mediaAttachments: [{
+    type: {
+      type: String,
+      enum: ['image', 'video'],
+      required: true
+    },
+    filename: {
+      type: String,
+      required: true
+    },
+    originalName: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    },
+    size: {
+      type: Number,
+      required: true
+    },
+    mimeType: {
+      type: String,
+      required: true
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   difficultyLevel: {
     type: Number,
     default: 1,

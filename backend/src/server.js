@@ -15,6 +15,7 @@ const adminPanelRoutes = require('./routes/adminPanel');
 const citiesRoutes = require('./routes/cities');
 const institutionsRoutes = require('./routes/institutions');
 const positionsRoutes = require('./routes/positions');
+const mediaRoutes = require('./routes/media');
 
 const { connectToDatabase } = require('./database/connection');
 const { startScheduler } = require('./services/scheduler');
@@ -73,6 +74,7 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/cities', citiesRoutes);
 app.use('/api/institutions', institutionsRoutes);
 app.use('/api/positions', positionsRoutes);
+app.use('/api/media', mediaRoutes);
 
 // Admin Panel
 app.use('/admin', adminPanelRoutes);

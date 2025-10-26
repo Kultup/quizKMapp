@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Адмін • Міста</title>
+    <link rel="stylesheet" href="/admin/css/admin.css" />
+    <link rel="icon" href="/admin/favicon.ico" />
+</head>
+<body>
+    <div id="admin-panel" class="admin-panel">
+        <header class="admin-header">
+            <h1>Адмін панель</h1>
+            <button id="logout-btn" class="btn btn-secondary">Вийти</button>
+        </header>
+        <div class="admin-body">
+            <aside class="admin-sidebar">
+                <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+                <nav class="sidebar-menu">
+                    <a href="/admin/dashboard" class="menu-item" data-page="dashboard">Дашборд</a>
+                    <a href="/admin/questions" class="menu-item" data-page="questions">Питання</a>
+                    <a href="/admin/categories" class="menu-item" data-page="categories">Категорії</a>
+                    <a href="/admin/users" class="menu-item" data-page="users">Користувачі</a>
+                    <a href="/admin/player-stats" class="menu-item" data-page="player-stats">Статистика гравців</a>
+                    <a href="/admin/cities" class="menu-item active" data-page="cities">Міста</a>
+                    <a href="/admin/institutions" class="menu-item" data-page="institutions">Заклади</a>
+                    <a href="/admin/positions" class="menu-item" data-page="positions">Посади</a>
+                    <a href="/admin/quizzes" class="menu-item" data-page="quizzes">Квізи</a>
+                    <a href="/admin/reports" class="menu-item" data-page="reports">Звіти</a>
+                    <a href="/admin/settings" class="menu-item" data-page="settings">Налаштування</a>
+                </nav>
+            </aside>
+            <main class="admin-content">
+                <section id="cities-page" class="page active">
+                    <div class="page-header">
+                        <h2>Міста</h2>
+                        <div class="actions">
+                            <button id="add-city-btn" class="btn btn-primary">Додати місто</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="cities-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Назва</th>
+                                    <th>Регіон</th>
+                                    <th>Країна</th>
+                                    <th>Статус</th>
+                                    <th>Створено</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h3>Вхід в адмін панель</h3>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required />
+                <input type="password" id="login-password" placeholder="Пароль" required />
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Увійти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- City modal -->
+    <div id="city-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="city-modal-title">Додати місто</h3>
+            <form id="city-form">
+                <input type="hidden" id="city-id" />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="city-name">Назва</label>
+                        <input id="city-name" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="city-region">Регіон</label>
+                        <input id="city-region" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label for="city-country">Країна</label>
+                        <input id="city-country" type="text" value="Україна" />
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                    <button type="submit" class="btn btn-primary">Зберегти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/admin/js/admin.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.admin && typeof window.admin.showAdminPanel === 'function') {
+                window.admin.showAdminPanel();
+            } else if (window.admin && typeof window.admin.init === 'function') {
+                window.admin.init();
+            }
+        });
+    </script>
+</body>
+</html>
