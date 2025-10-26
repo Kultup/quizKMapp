@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App - Адміністративна панель</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Removed blocked Chart.js CSS -->
+    
+    <link href="css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Завантаження...</p>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="login-container">
+                <h2><i class="fas fa-shield-alt"></i> Вхід в адмін панель</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Увійти
+                    </button>
+                </form>
+                <div id="login-error" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-graduation-cap"></i> Quiz Admin</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Дашборд</span>
+                </li>
+                <li class="menu-item" data-page="questions">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Питання</span>
+                </li>
+                <li class="menu-item" data-page="categories">
+                    <i class="fas fa-tags"></i>
+                    <span>Категорії</span>
+                </li>
+                <li class="menu-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>Користувачі</span>
+                </li>
+                <li class="menu-item" data-page="player-stats">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Статистика гравців</span>
+                </li>
+                <li class="menu-item" data-page="cities">
+                    <i class="fas fa-city"></i>
+                    <span>Міста</span>
+                </li>
+                <li class="menu-item" data-page="institutions">
+                    <i class="fas fa-building"></i>
+                    <span>Заклади</span>
+                </li>
+                <li class="menu-item" data-page="positions">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Посади</span>
+                </li>
+                <li class="menu-item" data-page="quizzes">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Квізи</span>
+                </li>
+                <li class="menu-item" data-page="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Звіти</span>
+                </li>
+                <li class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Налаштування</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Вийти
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button id="sidebar-toggle" class="btn btn-icon">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="page-title">Дашборд</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="user-name">Адміністратор</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-users">0</h3>
+                                <p>Користувачів</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-questions">0</h3>
+                                <p>Питань</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-quizzes">0</h3>
+                                <p>Квізів</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="avg-score">0%</h3>
+                                <p>Середній бал</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Активність користувачів</h3>
+                            <canvas id="users-chart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Результати квізів</h3>
+                            <canvas id="quiz-results-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3>Остання активність</h3>
+                        <div id="recent-activity-list" class="activity-list">
+                            <!-- Activity items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Questions Page -->
+                <div id="questions-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <button id="add-question-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Додати питання
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="questions-search" placeholder="Пошук питань...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="questions-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Питання</th>
+                                    <th>Категорія</th>
+                                    <th>Складність</th>
+                                    <th>Статус</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Questions will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prev-page" class="btn btn-secondary">Попередня</button>
+                        <span id="page-info">Сторінка 1 з 1</span>
+                        <button id="next-page" class="btn btn-secondary">Наступна</button>
+                    </div>
+                </div>
+
+                <!-- Categories Page -->
+                <div id="categories-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <button id="add-category-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Додати категорію
+                        </button>
+                    </div>
+
+                    <div class="categories-grid">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Users Page -->
+                <div id="users-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <div class="search-box">
+                            <input type="text" id="users-search" placeholder="Пошук користувачів...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="users-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ім'я</th>
+                                    <th>Місто</th>
+                                    <th>Посада</th>
+                                    <th>Бал</th>
+                                    <th>Тестів</th>
+                                    <th>Статус</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quizzes Page -->
+                <div id="quizzes-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <button id="generate-quiz-btn" class="btn btn-primary">
+                            <i class="fas fa-magic"></i> Згенерувати квіз
+                        </button>
+                    </div>
+
+                    <div class="quizzes-list">
+                        <!-- Quizzes will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reports-page" class="page" style="display: none;">
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Звіт по користувачах</h3>
+                            <p>Експорт даних користувачів у Excel</p>
+                            <button id="export-users-btn" class="btn btn-success">
+                                <i class="fas fa-download"></i> Завантажити
+                            </button>
+                        </div>
+                        <div class="report-card">
+                            <h3>Звіт по квізах</h3>
+                            <p>Статистика квізів за період</p>
+                            <div class="date-range">
+                                <input type="date" id="start-date">
+                                <input type="date" id="end-date">
+                            </div>
+                            <button id="export-quiz-btn" class="btn btn-success">
+                                <i class="fas fa-download"></i> Завантажити
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings-page" class="page" style="display: none;">
+                    <div class="settings-sections">
+                        <div class="settings-section">
+                            <h3>Налаштування квізів</h3>
+                            <div class="form-group">
+                                <label for="quiz-send-time">Час розсилки:</label>
+                                <input type="time" id="quiz-send-time" value="12:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="quiz-deadline-time">Дедлайн:</label>
+                                <input type="time" id="quiz-deadline-time" value="00:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="quiz-questions-count">Кількість питань:</label>
+                                <input type="number" id="quiz-questions-count" value="5" min="1" max="10">
+                            </div>
+                            <button id="save-settings-btn" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Зберегти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Stats Page -->
+                <div id="player-stats-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label for="stats-period">Період:</label>
+                                <select id="stats-period">
+                                    <option value="all">Весь час</option>
+                                    <option value="hour">Остання година</option>
+                                    <option value="week">Останній тиждень</option>
+                                    <option value="month">Останній місяць</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="stats-category">Категорія:</label>
+                                <select id="stats-category">
+                                    <option value="all">Всі категорії</option>
+                                </select>
+                            </div>
+                            <button id="refresh-stats-btn" class="btn btn-primary">
+                                <i class="fas fa-sync"></i> Оновити
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stats-summary">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="total-active-players">0</h3>
+                                <p>Активних гравців</p>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="avg-score-all">0%</h3>
+                                <p>Середній бал</p>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="total-quizzes-completed">0</h3>
+                                <p>Пройдено тестів</p>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="avg-streak">0</h3>
+                                <p>Середня серія</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="player-stats-container">
+                        <div class="stats-table-header">
+                            <h3>Рейтинг гравців</h3>
+                            <div class="table-controls">
+                                <div class="search-box">
+                                    <input type="text" id="player-search" placeholder="Пошук гравців...">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="player-stats-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Місце</th>
+                                        <th>Гравець</th>
+                                        <th>Місто</th>
+                                        <th>Посада</th>
+                                        <th>Загальний бал</th>
+                                        <th>Тестів</th>
+                                        <th>Середній бал</th>
+                                        <th>Точність</th>
+                                        <th>Серія</th>
+                                        <th>Останній тест</th>
+                                        <th>Дії</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Player stats will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pagination">
+                            <button id="prev-stats-page" class="btn btn-secondary">Попередня</button>
+                            <span id="stats-page-info">Сторінка 1 з 1</span>
+                            <button id="next-stats-page" class="btn btn-secondary">Наступна</button>
+                        </div>
+                    </div>
+
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <h3>Розподіл балів</h3>
+                            <canvas id="score-distribution-chart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Активність по категоріях</h3>
+                            <canvas id="category-activity-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cities Page -->
+                <div id="cities-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <button id="add-city-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Додати місто
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="cities-search" placeholder="Пошук міст...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="cities-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Назва</th>
+                                    <th>Область</th>
+                                    <th>Країна</th>
+                                    <th>Статус</th>
+                                    <th>Створено</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Cities will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Institutions Page -->
+                <div id="institutions-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <button id="add-institution-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Додати заклад
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="institutions-search" placeholder="Пошук закладів...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="institutions-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Назва</th>
+                                    <!-- Прибрано: Скорочена назва -->
+                                    <!-- Прибрано: Тип -->
+                                    <th>Місто</th>
+                                    <th>Статус</th>
+                                    <th>Створено</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Institutions will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Positions Page -->
+                <div id="positions-page" class="page" style="display: none;">
+                    <div class="page-header">
+                        <button id="add-position-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Додати посаду
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="positions-search" placeholder="Пошук посад...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="positions-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Назва</th>
+                                    <th>Категорія</th>
+                                    <!-- Рівень колонка прибрана -->
+                                    <th>Опис</th>
+                                    <th>Статус</th>
+                                    <th>Створено</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Positions will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Question Modal -->
+    <div id="question-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="question-modal-title">Додати питання</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="question-form">
+                    <input type="hidden" id="question-id">
+                    <div class="form-group">
+                        <label for="question-category">Категорія:</label>
+                        <select id="question-category" required>
+                            <option value="">Оберіть категорію</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="question-text">Текст питання:</label>
+                        <textarea id="question-text" required rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="option-a">Варіант A:</label>
+                            <input type="text" id="option-a" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="option-b">Варіант B:</label>
+                            <input type="text" id="option-b" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="option-c">Варіант C:</label>
+                            <input type="text" id="option-c" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="option-d">Варіант D:</label>
+                            <input type="text" id="option-d" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="correct-answer">Правильна відповідь:</label>
+                        <select id="correct-answer" required>
+                            <option value="">Оберіть відповідь</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="explanation">Пояснення:</label>
+                        <textarea id="explanation" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty-level">Рівень складності:</label>
+                        <select id="difficulty-level">
+                            <option value="1">1 - Легкий</option>
+                            <option value="2">2 - Середній</option>
+                            <option value="3">3 - Складний</option>
+                            <option value="4">4 - Дуже складний</option>
+                            <option value="5">5 - Експертний</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                <button type="submit" form="question-form" class="btn btn-primary">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="category-modal-title">Додати категорію</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="category-form">
+                    <input type="hidden" id="category-id">
+                    <div class="form-group">
+                        <label for="category-name">Назва категорії:</label>
+                        <input type="text" id="category-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category-description">Опис:</label>
+                        <textarea id="category-description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                <button type="submit" form="category-form" class="btn btn-primary">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- City Modal -->
+    <div id="city-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="city-modal-title">Додати місто</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="city-form">
+                    <input type="hidden" id="city-id">
+                    <div class="form-group">
+                        <label for="city-name">Назва міста:</label>
+                        <input type="text" id="city-name" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="city-region">Область:</label>
+                        <input type="text" id="city-region" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="city-country">Країна:</label>
+                        <input type="text" id="city-country" value="Україна" maxlength="100">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                <button type="submit" form="city-form" class="btn btn-primary">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Institution Modal -->
+    <div id="institution-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="institution-modal-title">Додати заклад</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="institution-form">
+                    <input type="hidden" id="institution-id">
+                    <input type="hidden" id="institution-type" value="школа">
+                    <div class="form-group">
+                        <label for="institution-name">Назва закладу:</label>
+                        <input type="text" id="institution-name" required maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="institution-city">Місто:</label>
+                        <select id="institution-city" required>
+                            <option value="">Оберіть місто</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                <button type="submit" form="institution-form" class="btn btn-primary">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Position Modal -->
+    <div id="position-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="position-modal-title">Додати посаду</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="position-form">
+                    <input type="hidden" id="position-id">
+                    <div class="form-group">
+                        <label for="position-name">Назва посади:</label>
+                        <input type="text" id="position-name" required maxlength="150">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="position-category">Категорія:</label>
+                            <select id="position-category" required>
+                                <option value="">Оберіть категорію</option>
+                                <option value="викладач">Викладач</option>
+                                <option value="адміністрація">Адміністрація</option>
+                                <option value="технічний персонал">Технічний персонал</option>
+                                <option value="допоміжний персонал">Допоміжний персонал</option>
+                                <option value="студент">Студент</option>
+                                <option value="учень">Учень</option>
+                                <option value="інше">Інше</option>
+                            </select>
+                        </div>
+                        <!-- Removed level field -->
+                    </div>
+                    <div class="form-group">
+                        <label for="position-description">Опис:</label>
+                        <textarea id="position-description" rows="3" maxlength="500"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">Скасувати</button>
+                <button type="submit" form="position-form" class="btn btn-primary">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/chart.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

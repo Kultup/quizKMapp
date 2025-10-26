@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест дашборду</title>
+</head>
+<body>
+    <h1>Тест завантаження дашборду</h1>
+    
+    <div id="test-results">
+        <h2>Результати тестів:</h2>
+        <div id="auth-test">Тест авторизації: <span id="auth-status">Очікування...</span></div>
+        <div id="dashboard-test">Тест дашборду: <span id="dashboard-status">Очікування...</span></div>
+        <div id="data-test">Тест даних: <span id="data-status">Очікування...</span></div>
+    </div>
+
+    <div id="dashboard-data">
+        <h2>Дані дашборду:</h2>
+        <pre id="data-output"></pre>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3001/api';
+        
+        async function testAuth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@quizapp.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                document.getElementById('auth-status').textContent = 'Успішно';
+                document.getElementById('auth-status').style.color = 'green';
+                return data.token;
+            } catch (error) {
+                document.getElementById('auth-status').textContent = `Помилка: ${error.message}`;
+                document.getElementById('auth-status').style.color = 'red';
+                throw error;
+            }
+        }
+        
+        async function testDashboard(token) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                document.getElementById('dashboard-status').textContent = 'Успішно';
+                document.getElementById('dashboard-status').style.color = 'green';
+                
+                // Показуємо дані
+                document.getElementById('data-output').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('data-status').textContent = 'Отримано';
+                document.getElementById('data-status').style.color = 'green';
+                
+                return data;
+            } catch (error) {
+                document.getElementById('dashboard-status').textContent = `Помилка: ${error.message}`;
+                document.getElementById('dashboard-status').style.color = 'red';
+                throw error;
+            }
+        }
+        
+        async function runTests() {
+            try {
+                console.log('Початок тестування...');
+                const token = await testAuth();
+                console.log('Авторизація успішна, токен:', token);
+                
+                const dashboardData = await testDashboard(token);
+                console.log('Дані дашборду:', dashboardData);
+                
+                console.log('Всі тести пройшли успішно!');
+            } catch (error) {
+                console.error('Помилка під час тестування:', error);
+            }
+        }
+        
+        // Запускаємо тести при завантаженні сторінки
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: quizapp-postgres
+    environment:
+      POSTGRES_DB: quizapp
+      POSTGRES_USER: quizapp_user
+      POSTGRES_PASSWORD: quizapp_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quizapp-network
+
+  # Backend API
+  backend:
+    build: .
+    container_name: quizapp-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: quizapp
+      DB_USER: quizapp_user
+      DB_PASSWORD: quizapp_password
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - quizapp-network
+    restart: unless-stopped
+
+  # Redis (for sessions and caching)
+  redis:
+    image: redis:7-alpine
+    container_name: quizapp-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - quizapp-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  quizapp-network:
+    driver: bridge
